@@ -29,7 +29,7 @@ export default function Home() {
       const newData = await response.json();
       console.log('Fetched status:', newData);
       
-      // Update state only if the fetched status is different
+      // Only update state if different
       if (newData.batteryLevel !== status.batteryLevel || newData.isConnected !== status.isConnected) {
         setStatus(newData);
       }
@@ -38,14 +38,17 @@ export default function Home() {
     }
   };
 
+
   useEffect(() => {
     fetchModules();
     fetchStatus(); // Initial fetch for status
-
-    const interval = setInterval(fetchStatus, 500); // Polling every 0.5 seconds
-
+    const interval = setInterval(500);
     return () => clearInterval(interval);
   }, []);
+
+
+
+
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
