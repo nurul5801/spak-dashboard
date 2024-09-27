@@ -10,7 +10,7 @@ export default function Home() {
   const [modules, setModules] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
   const [status, setStatus] = useState({ isConnected: false, batteryLevel: 0 });
-  const [isPolling, setIsPolling] = useState(true); // Control polling state
+  const [isPolling, setIsPolling] = useState(true);
 
   const fetchModules = async () => {
     try {
@@ -29,7 +29,7 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to fetch status');
       const data = await response.json();
       console.log('Fetched status:', data); // Log the fetched data
-      setStatus(data); // Update state
+      setStatus(data);
     } catch (error) {
       console.error('Error fetching status:', error);
     }
@@ -41,18 +41,17 @@ export default function Home() {
 
     const interval = setInterval(() => {
       if (isPolling) {
-        fetchStatus(); // Only fetch if polling is true
+        fetchStatus();
       }
     }, 500); // Fetch every 0.5 seconds
 
     return () => clearInterval(interval);
-  }, [isPolling]); // Depend on isPolling
+  }, [isPolling]);
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
   };
 
-  // Example function to change battery status
   const changeBatteryStatus = async (newStatus) => {
     try {
       const response = await fetch('/api/change-battery', {
@@ -60,17 +59,22 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ batteryLevel: newStatus }),
       });
+
       if (!response.ok) throw new Error('Failed to change battery status');
 
-      setIsPolling(false); // Stop polling while updating
-      await fetchStatus(); // Fetch updated status
-      setIsPolling(true); // Restart polling
+      // Stop polling to prevent immediate overwrite
+      setIsPolling(false);
+
+      // Fetch updated status after a brief delay
+      setTimeout(async () => {
+        await fetchStatus(); // Fetch updated status
+        setIsPolling(true); // Restart polling
+      }, 1000); // Delay for 1 second
     } catch (error) {
       console.error('Error changing battery status:', error);
     }
   };
 
-  // Prepare module data for DataCard
   const moduleData = selectedModule ? { name: selectedModule.name, data: selectedModule.name === 'NPK Sensor' ? npkData : {} } : null;
 
   return (
