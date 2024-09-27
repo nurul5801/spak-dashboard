@@ -10,7 +10,6 @@ export default function Home() {
   const [modules, setModules] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
   const [status, setStatus] = useState({ isConnected: false, batteryLevel: 0 });
-  const [isPolling, setIsPolling] = useState(true);
 
   const fetchModules = async () => {
     try {
@@ -37,16 +36,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchModules();
-    fetchStatus(); // Initial fetch
-
-    const interval = setInterval(() => {
-      if (isPolling) {
-        fetchStatus();
-      }
-    }, 500); // Fetch every 0.5 seconds
-
-    return () => clearInterval(interval);
-  }, [isPolling]);
+    fetchStatus(); // Initial fetch for status
+  }, []);
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
@@ -62,14 +53,8 @@ export default function Home() {
 
       if (!response.ok) throw new Error('Failed to change battery status');
 
-      // Stop polling to prevent immediate overwrite
-      setIsPolling(false);
-
-      // Fetch updated status after a brief delay
-      setTimeout(async () => {
-        await fetchStatus(); // Fetch updated status
-        setIsPolling(true); // Restart polling
-      }, 1000); // Delay for 1 second
+      // Fetch updated status after changing the battery level
+      await fetchStatus(); // Fetch updated status
     } catch (error) {
       console.error('Error changing battery status:', error);
     }
