@@ -42,8 +42,8 @@ export default function Home() {
   useEffect(() => {
     fetchModules();
     fetchStatus(); // Initial fetch for status
+
     const interval = setInterval(500);
-    return () => clearInterval(interval);
   }, []);
 
 
