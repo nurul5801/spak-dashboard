@@ -28,9 +28,9 @@ export async function POST(req, res) {
   }
 
   // Find the module and update its status
-  const module = modulesData.find((mod) => mod.name === name);
-  if (module) {
-    module.status = status; // Update status
+  const modul = modulesData.find((mod) => mod.name === name);
+  if (modul) {
+    modul.status = status; // Update status
     return new Response(
       JSON.stringify({ message: 'Module status updated successfully!' }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
