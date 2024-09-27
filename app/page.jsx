@@ -28,8 +28,8 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to fetch status');
       const newData = await response.json();
       console.log('Fetched status:', newData);
-      
-      // Only update state if different
+
+      // Only update state if the fetched status is different
       if (newData.batteryLevel !== status.batteryLevel || newData.isConnected !== status.isConnected) {
         setStatus(newData);
       }
@@ -38,17 +38,14 @@ export default function Home() {
     }
   };
 
-
   useEffect(() => {
-    fetchModules();
+    fetchModules(); // Initial fetch for modules
     fetchStatus(); // Initial fetch for status
 
-    const interval = setInterval(500);
+    const interval = setInterval(fetchStatus, 500); // Polling every 0.5 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
-
-
-
-
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
