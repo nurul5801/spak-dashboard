@@ -10,6 +10,7 @@ export default function Home() {
   const [modules, setModules] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
   const [status, setStatus] = useState({ isConnected: false, batteryLevel: 0 });
+  const [isPolling, setIsPolling] = useState(true); // Control polling state
 
   const fetchModules = async () => {
     try {
@@ -27,28 +28,46 @@ export default function Home() {
       const response = await fetch('/api/status');
       if (!response.ok) throw new Error('Failed to fetch status');
       const data = await response.json();
-      setStatus(data);
+      console.log('Fetched status:', data); // Log the fetched data
+      setStatus(data); // Update state
     } catch (error) {
       console.error('Error fetching status:', error);
     }
   };
 
   useEffect(() => {
-    const fetchData = () => {
-      fetchModules();
-      fetchStatus();
-    };
+    fetchModules();
+    fetchStatus(); // Initial fetch
 
-    // Fetch data immediately and set up interval
-    fetchData();
-    const interval = setInterval(fetchData, 500); // Fetch every 0.5 seconds
+    const interval = setInterval(() => {
+      if (isPolling) {
+        fetchStatus(); // Only fetch if polling is true
+      }
+    }, 500); // Fetch every 0.5 seconds
 
-    // Clean up the interval on component unmount
     return () => clearInterval(interval);
-  }, []);
+  }, [isPolling]); // Depend on isPolling
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
+  };
+
+  // Example function to change battery status
+  const changeBatteryStatus = async (newStatus) => {
+    try {
+      const response = await fetch('/api/change-battery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batteryLevel: newStatus }),
+      });
+      if (!response.ok) throw new Error('Failed to change battery status');
+
+      setIsPolling(false); // Stop polling while updating
+      await fetchStatus(); // Fetch updated status
+      setIsPolling(true); // Restart polling
+    } catch (error) {
+      console.error('Error changing battery status:', error);
+    }
   };
 
   // Prepare module data for DataCard
