@@ -1,6 +1,6 @@
 let statusData = {
   isConnected: true, // Example status
-  batteryLevel: 50, // Example battery level
+  batteryLevel: 10, // Example battery level
 };
 
 // Handle GET requests

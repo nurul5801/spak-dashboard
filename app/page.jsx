@@ -1,77 +1,51 @@
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
 import Header from "@/components/Header";
 import ModulesCard from "@/components/ModulesCard";
-import DataCard from "@/components/DataCard"; // Import the new DataCard component
+import DataCard from "@/components/DataCard"; 
 import Footer from "@/components/Footer"; 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export default function Home() {
   const [modules, setModules] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
-  const [npkData, setNpkData] = useState(null);
   const [status, setStatus] = useState({ isConnected: false, batteryLevel: 0 });
 
-  useEffect(() => {
-    const fetchModules = async () => {
-      try {
-        const res = await fetch('/api/modules');
-        if (!res.ok) throw new Error('Failed to fetch modules');
-        const data = await res.json();
-        setModules(data);
-      } catch (error) {
-        console.error('Error fetching modules:', error);
-      }
-    };
-
-    const fetchNpkData = async () => {
-      try {
-        const res = await fetch('/api/npk');
-        if (!res.ok) throw new Error('Failed to fetch NPK data');
-        const data = await res.json();
-        setNpkData(data);
-      } catch (error) {
-        console.error('Error fetching NPK data:', error);
-      }
-    };
-
-    const fetchStatus = async () => {
-      try {
-        const response = await fetch('/api/status');
-        if (!response.ok) throw new Error('Failed to fetch status');
-        const data = await response.json();
-        setStatus(data);
-      } catch (error) {
-        console.error('Error fetching status:', error);
-      }
-    };
-
-    fetchModules();
-    fetchNpkData();
-    fetchStatus();
-  }, []);
-
-  const changeModuleStatus = async (moduleName, newStatus) => {
+  const fetchModules = async () => {
     try {
-      const response = await fetch('/api/modules', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: moduleName, status: newStatus }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update module status');
-      }
-
-      const data = await response.json();
-      console.log(data.message);
-      fetchModules(); // Re-fetch modules to get updated status
+      const res = await fetch('/api/modules');
+      if (!res.ok) throw new Error('Failed to fetch modules');
+      const data = await res.json();
+      setModules(data);
     } catch (error) {
-      console.error('Error changing module status:', error);
+      console.error('Error fetching modules:', error);
     }
   };
+
+  const fetchStatus = async () => {
+    try {
+      const response = await fetch('/api/status');
+      if (!response.ok) throw new Error('Failed to fetch status');
+      const data = await response.json();
+      setStatus(data);
+    } catch (error) {
+      console.error('Error fetching status:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = () => {
+      fetchModules();
+      fetchStatus();
+    };
+
+    // Fetch data immediately and set up interval
+    fetchData();
+    const interval = setInterval(fetchData, 500); // Fetch every 0.5 seconds
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);

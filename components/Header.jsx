@@ -10,7 +10,7 @@ const akshar = Akshar({
   weight: ['400'],
 });
 
-function Header({ isConnected ,battaryStatus}) {
+function Header({ isConnected, batteryStatus }) { // Corrected here
   return (
     <div className="sticky top-0 left-0 right-0 z-10 flex items-center h-[70px] bg-white shadow px-5">
       {/* Logo */}
@@ -38,7 +38,7 @@ function Header({ isConnected ,battaryStatus}) {
         {isConnected && (
           <>
             <i className="fas fa-battery-full text-gray-600 text-[40px]"></i>
-            <p className={`${akshar.className} text-lg`}>{battaryStatus+" %"}</p>
+            <p className={`${akshar.className} text-lg`}>{batteryStatus} %</p> {/* Corrected here */}
           </>
         )}
       </div>
