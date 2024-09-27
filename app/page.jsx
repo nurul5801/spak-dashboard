@@ -26,9 +26,13 @@ export default function Home() {
     try {
       const response = await fetch('/api/status');
       if (!response.ok) throw new Error('Failed to fetch status');
-      const data = await response.json();
-      console.log('Fetched status:', data);
-      setStatus(data);
+      const newData = await response.json();
+      console.log('Fetched status:', newData);
+      
+      // Update state only if the fetched status is different
+      if (newData.batteryLevel !== status.batteryLevel || newData.isConnected !== status.isConnected) {
+        setStatus(newData);
+      }
     } catch (error) {
       console.error('Error fetching status:', error);
     }
@@ -38,9 +42,7 @@ export default function Home() {
     fetchModules();
     fetchStatus(); // Initial fetch for status
 
-    const interval = setInterval(() => {
-      fetchStatus(); // Polling every 0.5 seconds or adjust as necessary
-    }, 500);
+    const interval = setInterval(fetchStatus, 500); // Polling every 0.5 seconds
 
     return () => clearInterval(interval);
   }, []);
