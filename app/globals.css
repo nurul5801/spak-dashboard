@@ -31,3 +31,14 @@
     text-wrap: balance;
   }
 }
+
+
+/* styles/globals.css */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Hide the scrollbar for webkit browsers */
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
