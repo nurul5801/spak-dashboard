@@ -27,7 +27,7 @@ export default function Home() {
       const response = await fetch('/api/status');
       if (!response.ok) throw new Error('Failed to fetch status');
       const data = await response.json();
-      console.log('Fetched status:', data); // Log the fetched data
+      console.log('Fetched status:', data);
       setStatus(data);
     } catch (error) {
       console.error('Error fetching status:', error);
@@ -37,27 +37,16 @@ export default function Home() {
   useEffect(() => {
     fetchModules();
     fetchStatus(); // Initial fetch for status
+
+    const interval = setInterval(() => {
+      fetchStatus(); // Polling every 0.5 seconds or adjust as necessary
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleModuleClick = (module) => {
     setSelectedModule(module);
-  };
-
-  const changeBatteryStatus = async (newStatus) => {
-    try {
-      const response = await fetch('/api/change-battery', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batteryLevel: newStatus }),
-      });
-
-      if (!response.ok) throw new Error('Failed to change battery status');
-
-      // Fetch updated status after changing the battery level
-      await fetchStatus(); // Fetch updated status
-    } catch (error) {
-      console.error('Error changing battery status:', error);
-    }
   };
 
   const moduleData = selectedModule ? { name: selectedModule.name, data: selectedModule.name === 'NPK Sensor' ? npkData : {} } : null;
